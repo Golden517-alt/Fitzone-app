@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitZone – Elite Gym Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-green: #00FF88;
+    --neon-cyan: #00EEFF;
+    --neon-pink: #FF2D78;
+    --neon-yellow: #FFE600;
+    --dark-bg: #060810;
+    --card-bg: #0D1117;
+    --card2: #111827;
+    --border: rgba(0,255,136,0.18);
+    --text: #E8F0FE;
+    --muted: #6B7280;
+    --font-head: 'Bebas Neue', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-ui: 'Barlow Condensed', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--dark-bg); color:var(--text); font-family:var(--font-body); overflow-x:hidden; }
+  
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+  }
+  
+  /* ── SCANLINE OVERLAY ── */
+  body::after {
+    content:''; position:fixed; inset:0; z-index:0;
+    background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+    pointer-events:none;
+  }
+
+  /* ──────── LOGIN SCREEN ──────── */
+  #loginScreen {
+    position:fixed; inset:0; z-index:1000;
+    background:radial-gradient(ellipse at 60% 40%, #0a1a12 0%, #060810 70%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .login-wrap {
+    position:relative; width:420px; max-width:94vw;
+    animation: loginFadeIn 0.8s ease;
+  }
+  @keyframes loginFadeIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  
+  .login-logo {
+    text-align:center; margin-bottom:36px;
+  }
+  .login-logo .brand {
+    font-family:var(--font-head); font-size:64px; letter-spacing:4px;
+    background:linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 20px rgba(0,255,136,0.5));
+    display:block; line-height:1;
+  }
+  .login-logo .tagline {
+    font-family:var(--font-ui); font-size:13px; letter-spacing:6px;
+    color:var(--muted); text-transform:uppercase; margin-top:6px;
+  }
+  
+  .login-card {
+    background:linear-gradient(145deg, rgba(13,17,23,0.95), rgba(17,24,39,0.98));
+    border:1px solid var(--border);
+    border-radius:20px; padding:40px 36px;
+    box-shadow:0 0 60px rgba(0,255,136,0.08), 0 0 120px rgba(0,0,0,0.8);
+    backdrop-filter:blur(20px);
+  }
+  .login-card h2 {
+    font-family:var(--font-ui); font-size:22px; font-weight:600;
+    letter-spacing:3px; text-transform:uppercase;
+    color:var(--text); margin-bottom:28px; text-align:center;
+  }
+  .login-card h2 span { color:var(--neon-green); }
+  
+  .input-group { margin-bottom:20px; position:relative; }
+  .input-group label {
+    display:block; font-family:var(--font-ui); font-size:11px;
+    letter-spacing:3px; text-transform:uppercase; color:var(--neon-green);
+    margin-bottom:8px;
+  }
+  .input-group input {
+    width:100%; background:rgba(0,255,136,0.04);
+    border:1px solid rgba(0,255,136,0.2); border-radius:10px;
+    padding:14px 18px; color:var(--text); font-family:var(--font-body);
+    font-size:16px; letter-spacing:1px; outline:none;
+    transition:border-color 0.3s, box-shadow 0.3s;
+  }
+  .input-group input:focus {
+    border-color:var(--neon-green);
+    box-shadow:0 0 20px rgba(0,255,136,0.15), inset 0 0 20px rgba(0,255,136,0.05);
+  }
+  .input-group .eye-btn {
+    position:absolute; right:14px; top:38px;
+    background:none; border:none; cursor:pointer;
+    color:var(--muted); font-size:18px;
+  }
+  
+  .login-btn {
+    width:100%; padding:16px; margin-top:8px;
+    background:linear-gradient(135deg, var(--neon-green), #00cc6e);
+    border:none; border-radius:10px; cursor:pointer;
+    font-family:var(--font-head); font-size:22px; letter-spacing:4px;
+    color:#060810; transition:all 0.3s;
+    box-shadow:0 0 30px rgba(0,255,136,0.3);
+  }
+  .login-btn:hover {
+    transform:translateY(-2px);
+    box-shadow:0 0 50px rgba(0,255,136,0.5);
+  }
+  .login-btn:active { transform:translateY(0); }
+  
+  .login-error {
+    background:rgba(255,45,120,0.1); border:1px solid rgba(255,45,120,0.4);
+    border-radius:8px; padding:12px 16px; margin-top:16px;
+    font-family:var(--font-ui); font-size:13px; letter-spacing:1px;
+    color:var(--neon-pink); text-align:center; display:none;
+  }
+  .login-badge {
+    text-align:center; margin-top:20px;
+    font-family:var(--font-ui); font-size:11px; letter-spacing:2px;
+    color:var(--muted); text-transform:uppercase;
+  }
+  .login-badge span { color:var(--neon-cyan); }
+
+  /* ──────── MAIN APP ──────── */
+  #app { display:none; position:relative; z-index:1; min-height:100vh; }
+  
+  /* ── TOP NAV ── */
+  .topnav {
+    position:sticky; top:0; z-index:100;
+    background:rgba(6,8,16,0.92); backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(0,255,136,0.12);
+    padding:0 24px; height:64px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-brand {
+    font-family:var(--font-head); font-size:32px; letter-spacing:3px;
+    background:linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 10px rgba(0,255,136,0.4));
+  }
+  .nav-right { display:flex; align-items:center; gap:12px; }
+  .nav-avatar {
+    width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-head); font-size:18px; color:#060810;
+    cursor:pointer; box-shadow:0 0 15px rgba(0,255,136,0.4);
+  }
+  .logout-btn {
+    background:rgba(255,45,120,0.15); border:1px solid rgba(255,45,120,0.3);
+    border-radius:8px; padding:7px 16px; cursor:pointer;
+    font-family:var(--font-ui); font-size:12px; letter-spacing:2px;
+    color:var(--neon-pink); transition:all 0.3s; text-transform:uppercase;
+  }
+  .logout-btn:hover { background:rgba(255,45,120,0.25); }
+
+  /* ── BOTTOM TABS ── */
+  .bottom-tabs {
+    position:fixed; bottom:0; left:0; right:0; z-index:100;
+    background:rgba(6,8,16,0.96); backdrop-filter:blur(20px);
+    border-top:1px solid rgba(0,255,136,0.12);
+    display:flex; height:68px;
+  }
+  .tab-btn {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:4px; background:none; border:none;
+    cursor:pointer; color:var(--muted); transition:all 0.3s;
+    font-family:var(--font-ui); font-size:10px; letter-spacing:2px;
+    text-transform:uppercase; position:relative;
+  }
+  .tab-btn .tab-icon { font-size:22px; transition:all 0.3s; }
+  .tab-btn.active { color:var(--neon-green); }
+  .tab-btn.active .tab-icon { filter:drop-shadow(0 0 8px var(--neon-green)); }
+  .tab-btn.active::before {
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:36px; height:2px; background:var(--neon-green);
+    box-shadow:0 0 12px var(--neon-green);
+    border-radius:0 0 4px 4px;
+  }
+
+  /* ── PAGES ── */
+  .page { display:none; padding:24px 20px 90px; max-width:600px; margin:0 auto; }
+  .page.active { display:block; }
+
+  /* ──────── DASHBOARD ──────── */
+  .welcome-bar {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:24px;
+  }
+  .welcome-bar h1 {
+    font-family:var(--font-head); font-size:36px; letter-spacing:2px;
+    line-height:1;
+  }
+  .welcome-bar h1 span { color:var(--neon-green); }
+  .welcome-bar .date-pill {
+    background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.2);
+    border-radius:20px; padding:6px 14px;
+    font-family:var(--font-ui); font-size:12px; letter-spacing:1px;
+    color:var(--neon-green);
+  }
+
+  /* STATS STRIP */
+  .stats-strip {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin-bottom:24px;
+  }
+  .stat-card {
+    background:var(--card-bg); border:1px solid rgba(0,238,255,0.15);
+    border-radius:14px; padding:16px 12px; text-align:center;
+    position:relative; overflow:hidden;
+    transition:transform 0.3s, box-shadow 0.3s;
+  }
+  .stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+  .stat-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  }
+  .stat-card.cyan::before { background:linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
+  .stat-card.green::before { background:linear-gradient(90deg, transparent, var(--neon-green), transparent); }
+  .stat-card.pink::before { background:linear-gradient(90deg, transparent, var(--neon-pink), transparent); }
+  .stat-num {
+    font-family:var(--font-head); font-size:32px; line-height:1;
+    margin:6px 0 4px;
+  }
+  .stat-card.cyan .stat-num { color:var(--neon-cyan); text-shadow:0 0 20px rgba(0,238,255,0.5); }
+  .stat-card.green .stat-num { color:var(--neon-green); text-shadow:0 0 20px rgba(0,255,136,0.5); }
+  .stat-card.pink .stat-num { color:var(--neon-pink); text-shadow:0 0 20px rgba(255,45,120,0.5); }
+  .stat-label {
+    font-family:var(--font-ui); font-size:10px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--muted);
+  }
+
+  /* TODAY WORKOUT */
+  .section-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .section-title {
+    font-family:var(--font-head); font-size:26px; letter-spacing:2px;
+    color:var(--text);
+  }
+  .section-title .accent { color:var(--neon-green); }
+  .badge-pill {
+    background:rgba(0,255,136,0.15); border:1px solid rgba(0,255,136,0.3);
+    border-radius:20px; padding:4px 12px;
+    font-family:var(--font-ui); font-size:11px; letter-spacing:2px;
+    color:var(--neon-green); text-transform:uppercase;
+  }
+
+  /* WEEK SELECTOR */
+  .week-selector {
+    display:flex; gap:8px; margin-bottom:20px; overflow-x:auto;
+    padding-bottom:4px; scrollbar-width:none;
+  }
+  .week-selector::-webkit-scrollbar { display:none; }
+  .week-chip {
+    flex-shrink:0; padding:8px 16px;
+    background:var(--card-bg); border:1px solid rgba(0,255,136,0.15);
+    border-radius:20px; cursor:pointer;
+    font-family:var(--font-ui); font-size:12px; letter-spacing:2px;
+    color:var(--muted); transition:all 0.3s; text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .week-chip.active {
+    background:rgba(0,255,136,0.15); border-color:var(--neon-green);
+    color:var(--neon-green);
+    box-shadow:0 0 15px rgba(0,255,136,0.2);
+  }
+
+  /* DAY STRIP */
+  .day-strip {
+    display:flex; gap:8px; margin-bottom:22px; overflow-x:auto;
+    padding-bottom:4px; scrollbar-width:none;
+  }
+  .day-strip::-webkit-scrollbar { display:none; }
+  .day-chip {
+    flex-shrink:0; width:52px; padding:10px 0;
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px; cursor:pointer; text-align:center;
+    transition:all 0.3s;
+  }
+  .day-chip .day-name {
+    font-family:var(--font-ui); font-size:10px; letter-spacing:2px;
+    color:var(--muted); text-transform:uppercase; display:block;
+  }
+  .day-chip .day-num {
+    font-family:var(--font-head); font-size:22px; color:var(--text);
+    display:block; line-height:1.2;
+  }
+  .day-chip.active {
+    background:rgba(0,255,136,0.12); border-color:var(--neon-green);
+    box-shadow:0 0 20px rgba(0,255,136,0.15);
+  }
+  .day-chip.active .day-name { color:var(--neon-green); }
+  .day-chip.active .day-num { color:var(--neon-green); }
+  .day-chip.done { position:relative; }
+  .day-chip.done::after {
+    content:'✓'; position:absolute; top:4px; right:4px;
+    font-size:10px; color:var(--neon-green);
+  }
+
+  /* WORKOUT CARD */
+  .workout-card {
+    background:linear-gradient(145deg, var(--card-bg), var(--card2));
+    border:1px solid rgba(0,255,136,0.15); border-radius:18px;
+    overflow:hidden; margin-bottom:14px;
+    transition:transform 0.3s, box-shadow 0.3s;
+  }
+  .workout-card:hover {
+    transform:translateY(-3px);
+    box-shadow:0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,136,0.08);
+  }
+  .video-thumb {
+    position:relative; height:200px; overflow:hidden; cursor:pointer;
+    background:linear-gradient(145deg, #0a1520, #111827);
+  }
+  .video-thumb img {
+    width:100%; height:100%; object-fit:cover; opacity:0.7;
+    transition:opacity 0.3s, transform 0.3s;
+  }
+  .video-thumb:hover img { opacity:0.9; transform:scale(1.03); }
+  .play-overlay {
+    position:absolute; inset:0; display:flex;
+    align-items:center; justify-content:center;
+  }
+  .play-btn {
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(0,255,136,0.2); border:2px solid var(--neon-green);
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; color:var(--neon-green);
+    backdrop-filter:blur(4px);
+    box-shadow:0 0 30px rgba(0,255,136,0.4);
+    transition:all 0.3s;
+  }
+  .play-btn:hover {
+    background:rgba(0,255,136,0.35);
+    box-shadow:0 0 50px rgba(0,255,136,0.6);
+    transform:scale(1.1);
+  }
+  .video-label {
+    position:absolute; bottom:10px; left:12px;
+    background:rgba(0,0,0,0.7); border-radius:6px; padding:4px 10px;
+    font-family:var(--font-ui); font-size:11px; letter-spacing:1px;
+    color:var(--neon-cyan); backdrop-filter:blur(4px);
+  }
+  .workout-info { padding:18px 18px 14px; }
+  .workout-info h3 {
+    font-family:var(--font-head); font-size:26px; letter-spacing:2px;
+    color:var(--text); margin-bottom:8px;
+  }
+  .workout-meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .meta-tag {
+    font-family:var(--font-ui); font-size:11px; letter-spacing:2px;
+    text-transform:uppercase; padding:4px 12px; border-radius:20px;
+  }
+  .meta-tag.sets { background:rgba(0,238,255,0.12); color:var(--neon-cyan); border:1px solid rgba(0,238,255,0.25); }
+  .meta-tag.reps { background:rgba(0,255,136,0.12); color:var(--neon-green); border:1px solid rgba(0,255,136,0.25); }
+  .meta-tag.rest { background:rgba(255,230,0,0.12); color:var(--neon-yellow); border:1px solid rgba(255,230,0,0.25); }
+  .meta-tag.muscle { background:rgba(255,45,120,0.12); color:var(--neon-pink); border:1px solid rgba(255,45,120,0.25); }
+
+  .done-toggle {
+    display:flex; align-items:center; gap:10px;
+    background:none; border:1px solid rgba(0,255,136,0.2);
+    border-radius:10px; padding:10px 16px; cursor:pointer;
+    font-family:var(--font-ui); font-size:13px; letter-spacing:2px;
+    color:var(--muted); transition:all 0.3s; width:100%;
+    text-transform:uppercase;
+  }
+  .done-toggle.completed {
+    background:rgba(0,255,136,0.1); border-color:var(--neon-green);
+    color:var(--neon-green);
+  }
+  .done-toggle .check-icon { font-size:18px; }
+
+  /* ──────── PROGRESS PAGE ──────── */
+  .progress-hero {
+    background:linear-gradient(145deg, #0a1a12, #0d1117);
+    border:1px solid rgba(0,255,136,0.2); border-radius:20px;
+    padding:24px; margin-bottom:24px; position:relative; overflow:hidden;
+  }
+  .progress-hero::before {
+    content:''; position:absolute; top:-30px; right:-30px;
+    width:120px; height:120px; border-radius:50%;
+    background:radial-gradient(circle, rgba(0,255,136,0.15), transparent 70%);
+  }
+  .progress-pct {
+    font-family:var(--font-head); font-size:72px; color:var(--neon-green);
+    text-shadow:0 0 30px rgba(0,255,136,0.5); line-height:1;
+  }
+  .progress-pct span { font-size:32px; }
+  .progress-label {
+    font-family:var(--font-ui); font-size:13px; letter-spacing:3px;
+    color:var(--muted); text-transform:uppercase; margin-top:4px;
+  }
+
+  /* BAR CHART */
+  .week-chart { margin-bottom:24px; }
+  .chart-bars { display:flex; gap:6px; align-items:flex-end; height:120px; margin:16px 0 8px; }
+  .bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; }
+  .bar-fill {
+    width:100%; border-radius:6px 6px 0 0;
+    background:linear-gradient(180deg, var(--neon-green), rgba(0,255,136,0.3));
+    box-shadow:0 0 10px rgba(0,255,136,0.3);
+    transition:height 0.8s cubic-bezier(.34,1.56,.64,1);
+    min-height:4px;
+  }
+  .bar-fill.inactive {
+    background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+    box-shadow:none;
+  }
+  .bar-label {
+    font-family:var(--font-ui); font-size:10px; letter-spacing:1px;
+    color:var(--muted); text-transform:uppercase;
+  }
+
+  /* STREAK CALENDAR */
+  .streak-grid {
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px;
+    margin-top:14px;
+  }
+  .streak-day {
+    aspect-ratio:1; border-radius:6px; display:flex;
+    align-items:center; justify-content:center;
+    font-family:var(--font-ui); font-size:11px; font-weight:600;
+  }
+  .streak-day.done {
+    background:rgba(0,255,136,0.2); color:var(--neon-green);
+    border:1px solid rgba(0,255,136,0.3);
+    box-shadow:0 0 8px rgba(0,255,136,0.2);
+  }
+  .streak-day.empty {
+    background:rgba(255,255,255,0.04); color:var(--muted);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .streak-day.today {
+    background:rgba(0,238,255,0.15); color:var(--neon-cyan);
+    border:1px solid rgba(0,238,255,0.4);
+    box-shadow:0 0 12px rgba(0,238,255,0.2);
+  }
+
+  /* ACHIEVEMENT BADGES */
+  .badges-row { display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+  .badges-row::-webkit-scrollbar { display:none; }
+  .badge-card {
+    flex-shrink:0; width:100px;
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px; padding:14px 10px; text-align:center;
+    transition:all 0.3s;
+  }
+  .badge-card.unlocked { border-color:var(--neon-yellow); background:rgba(255,230,0,0.08); }
+  .badge-icon { font-size:28px; margin-bottom:6px; display:block; }
+  .badge-name {
+    font-family:var(--font-ui); font-size:10px; letter-spacing:1px;
+    color:var(--muted); text-transform:uppercase;
+  }
+  .badge-card.unlocked .badge-name { color:var(--neon-yellow); }
+
+  /* ──────── PROGRAMS PAGE ──────── */
+  .program-card {
+    background:linear-gradient(145deg, var(--card-bg), var(--card2));
+    border:1px solid rgba(0,238,255,0.15); border-radius:18px;
+    overflow:hidden; margin-bottom:16px; cursor:pointer;
+    transition:all 0.3s;
+  }
+  .program-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+  .program-header {
+    padding:20px 20px 14px;
+    background:linear-gradient(135deg, rgba(0,238,255,0.08), transparent);
+    border-bottom:1px solid rgba(0,238,255,0.1);
+  }
+  .program-level {
+    font-family:var(--font-ui); font-size:10px; letter-spacing:3px;
+    text-transform:uppercase; margin-bottom:6px;
+  }
+  .program-level.beginner { color:var(--neon-green); }
+  .program-level.intermediate { color:var(--neon-cyan); }
+  .program-level.advanced { color:var(--neon-pink); }
+  .program-name {
+    font-family:var(--font-head); font-size:28px; letter-spacing:2px; color:var(--text);
+  }
+  .program-body { padding:16px 20px; }
+  .program-stats { display:flex; gap:16px; }
+  .prog-stat {
+    font-family:var(--font-ui); font-size:12px; letter-spacing:1px; color:var(--muted);
+  }
+  .prog-stat strong { color:var(--neon-cyan); font-size:16px; font-family:var(--font-head); }
+  .progress-bar-wrap {
+    margin-top:14px; background:rgba(255,255,255,0.06);
+    border-radius:20px; height:6px; overflow:hidden;
+  }
+  .progress-bar-fill {
+    height:100%; border-radius:20px;
+    background:linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+    box-shadow:0 0 10px var(--neon-cyan);
+    transition:width 1s ease;
+  }
+
+  /* ──────── VIDEO MODAL ──────── */
+  .video-modal {
+    position:fixed; inset:0; z-index:200;
+    background:rgba(0,0,0,0.92); backdrop-filter:blur(10px);
+    display:none; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .video-modal.open { display:flex; }
+  .modal-inner {
+    background:var(--card-bg); border:1px solid rgba(0,255,136,0.2);
+    border-radius:20px; overflow:hidden;
+    width:100%; max-width:560px;
+    animation:modalIn 0.3s ease;
+  }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+  .modal-video {
+    width:100%; aspect-ratio:16/9; background:#000;
+    display:flex; align-items:center; justify-content:center;
+    font-size:60px; color:rgba(255,255,255,0.1);
+    position:relative; overflow:hidden;
+  }
+  .modal-video iframe { width:100%; height:100%; border:none; }
+  .modal-info { padding:20px; }
+  .modal-info h3 { font-family:var(--font-head); font-size:28px; letter-spacing:2px; margin-bottom:6px; }
+  .modal-info p { font-family:var(--font-body); font-size:14px; color:var(--muted); line-height:1.6; }
+  .modal-close {
+    position:absolute; top:16px; right:16px; z-index:10;
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(255,45,120,0.2); border:1px solid rgba(255,45,120,0.4);
+    color:var(--neon-pink); cursor:pointer; font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .modal-wrapper { position:relative; }
+
+  /* ──────── TASKS PAGE ──────── */
+  .task-item {
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px; padding:16px 18px; margin-bottom:10px;
+    display:flex; align-items:center; gap:14px;
+    transition:all 0.3s; cursor:pointer;
+  }
+  .task-item:hover { border-color:rgba(0,255,136,0.2); }
+  .task-item.done-task {
+    opacity:0.5; text-decoration:line-through;
+    border-color:rgba(0,255,136,0.3);
+    background:rgba(0,255,136,0.05);
+  }
+  .task-check {
+    width:24px; height:24px; border-radius:6px; flex-shrink:0;
+    border:2px solid rgba(0,255,136,0.3);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--neon-green); font-size:14px;
+    transition:all 0.3s;
+  }
+  .task-item.done-task .task-check {
+    background:var(--neon-green); border-color:var(--neon-green); color:#060810;
+  }
+  .task-content h4 { font-family:var(--font-ui); font-size:15px; letter-spacing:1px; color:var(--text); }
+  .task-content p { font-family:var(--font-body); font-size:13px; color:var(--muted); margin-top:2px; }
+  .task-badge {
+    margin-left:auto; flex-shrink:0;
+    padding:4px 10px; border-radius:20px;
+    font-family:var(--font-ui); font-size:10px; letter-spacing:2px;
+    text-transform:uppercase;
+  }
+  .task-badge.warm { background:rgba(255,230,0,0.12); color:var(--neon-yellow); }
+  .task-badge.lift { background:rgba(0,238,255,0.12); color:var(--neon-cyan); }
+  .task-badge.cool { background:rgba(255,45,120,0.12); color:var(--neon-pink); }
+  .task-badge.nutrition { background:rgba(0,255,136,0.12); color:var(--neon-green); }
+
+  /* ──────── UTILITIES ──────── */
+  .card {
+    background:var(--card-bg); border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px; padding:20px; margin-bottom:16px;
+  }
+  .card-title {
+    font-family:var(--font-head); font-size:20px; letter-spacing:2px;
+    color:var(--text); margin-bottom:14px;
+  }
+  .neon-green { color:var(--neon-green); }
+  .neon-cyan { color:var(--neon-cyan); }
+  .neon-pink { color:var(--neon-pink); }
+
+  /* TOAST */
+  .toast {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:rgba(0,255,136,0.15); border:1px solid rgba(0,255,136,0.4);
+    border-radius:20px; padding:12px 24px; z-index:500;
+    font-family:var(--font-ui); font-size:13px; letter-spacing:2px;
+    color:var(--neon-green); text-transform:uppercase;
+    opacity:0; transition:all 0.4s; pointer-events:none;
+    backdrop-filter:blur(10px);
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(0,255,136,0.2); border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <span class="brand">FITZONE</span>
+      <div class="tagline">Elite Gym Member Portal</div>
+    </div>
+    <div class="login-card">
+      <h2>Member <span>Access</span></h2>
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="usernameInput" placeholder="Enter your username" autocomplete="off" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="Enter your password" />
+        <button class="eye-btn" onclick="togglePass()" id="eyeBtn">👁</button>
+      </div>
+      <button class="login-btn" onclick="doLogin()">ACCESS GYM →</button>
+      <div class="login-error" id="loginError">⚠ Invalid credentials. Members only.</div>
+      <div class="login-badge">🔒 Secured · <span>FitZone Members Only</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="app">
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="nav-brand">FITZONE</div>
+    <div class="nav-right">
+      <div class="nav-avatar" title="Member">F</div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- PAGE: DASHBOARD -->
+  <div class="page active" id="page-home">
+    <div class="welcome-bar">
+      <h1>TRAIN<br><span>HARD</span></h1>
+      <div class="date-pill" id="dateDisplay"></div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-card cyan">
+        <div class="stat-label">Workouts</div>
+        <div class="stat-num" id="statWorkouts">0</div>
+        <div class="stat-label">Done</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Streak</div>
+        <div class="stat-num" id="statStreak">0</div>
+        <div class="stat-label">Days</div>
+      </div>
+      <div class="stat-card pink">
+        <div class="stat-label">Week</div>
+        <div class="stat-num" id="statWeek">1</div>
+        <div class="stat-label">Active</div>
+      </div>
+    </div>
+
+    <!-- WEEK SELECTOR -->
+    <div class="section-header">
+      <div class="section-title">WEEK <span class="accent" id="activeWeekLabel">1</span></div>
+    </div>
+    <div class="week-selector" id="weekSelector"></div>
+
+    <!-- DAY STRIP -->
+    <div class="day-strip" id="dayStrip"></div>
+
+    <!-- TODAY'S WORKOUT -->
+    <div class="section-header">
+      <div class="section-title">TODAY'S <span class="accent">LIFT</span></div>
+      <div class="badge-pill" id="dayMuscle">CHEST</div>
+    </div>
+    <div id="workoutCards"></div>
+  </div>
+
+  <!-- PAGE: PROGRESS -->
+  <div class="page" id="page-progress">
+    <div class="section-title" style="margin-bottom:20px">YOUR <span class="neon-green">PROGRESS</span></div>
+
+    <div class="progress-hero">
+      <div class="progress-pct" id="progressPct">0<span>%</span></div>
+      <div class="progress-label">Program Completion</div>
+    </div>
+
+    <div class="card week-chart">
+      <div class="card-title">Weekly Workouts</div>
+      <div class="chart-bars" id="weekChart"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Streak Calendar <span class="neon-green" id="streakCount" style="font-size:16px"></span></div>
+      <div class="streak-grid" id="streakGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Achievements</div>
+      <div class="badges-row" id="badgesRow"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: PROGRAMS -->
+  <div class="page" id="page-programs">
+    <div class="section-title" style="margin-bottom:20px">GYM <span class="neon-cyan">PROGRAMS</span></div>
+
+    <div id="programsList"></div>
+  </div>
+
+  <!-- PAGE: TASKS -->
+  <div class="page" id="page-tasks">
+    <div class="section-title" style="margin-bottom:20px">GYM <span class="neon-pink">TASKS</span></div>
+    <div class="section-header" style="margin-bottom:16px">
+      <div style="font-family:var(--font-ui);font-size:13px;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Today's Checklist</div>
+      <div class="badge-pill" id="taskBadge">0/0</div>
+    </div>
+    <div id="taskList"></div>
+  </div>
+
+  <!-- BOTTOM TABS -->
+  <nav class="bottom-tabs">
+    <button class="tab-btn active" onclick="showPage('home',this)">
+      <span class="tab-icon">🏠</span> Home
+    </button>
+    <button class="tab-btn" onclick="showPage('progress',this)">
+      <span class="tab-icon">📈</span> Progress
+    </button>
+    <button class="tab-btn" onclick="showPage('programs',this)">
+      <span class="tab-icon">💪</span> Programs
+    </button>
+    <button class="tab-btn" onclick="showPage('tasks',this)">
+      <span class="tab-icon">✅</span> Tasks
+    </button>
+  </nav>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="video-modal" id="videoModal">
+  <div class="modal-wrapper" style="width:100%;max-width:560px;position:relative;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-inner">
+      <div class="modal-video">
+        <iframe id="modalIframe" src="" allowfullscreen></iframe>
+      </div>
+      <div class="modal-info">
+        <h3 id="modalTitle"></h3>
+        <p id="modalDesc"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+const CREDS = { user: 'Fitzone', pass: 'aap gym kre' };
+
+const PROGRAMS = [
+  { name:'POWER STARTER', level:'beginner', weeks:4, focus:'Full Body Strength', progress:0 },
+  { name:'HYPERTROPHY X', level:'intermediate', weeks:8, focus:'Muscle Hypertrophy', progress:35 },
+  { name:'BEAST MODE', level:'advanced', weeks:12, focus:'Max Strength & Size', progress:10 },
+  { name:'CARDIO SHRED', level:'beginner', weeks:6, focus:'Fat Loss & Conditioning', progress:0 },
+  { name:'POWERLIFTING', level:'advanced', weeks:16, focus:'Squat / Bench / Deadlift', progress:0 },
+];
+
+// YouTube embed IDs for real exercise videos
+const WORKOUT_DATA = {
+  1: { muscle:'CHEST', exercises:[
+    { name:'Barbell Bench Press', sets:4, reps:'8-10', rest:'90s', muscle:'Chest', ytId:'SCVCLChPQEs', desc:'Lie flat on bench, grip slightly wider than shoulder width. Lower bar to chest and press up explosively.' },
+    { name:'Incline Dumbbell Press', sets:3, reps:'10-12', rest:'60s', muscle:'Upper Chest', ytId:'0G2_XV7slIg', desc:'Set bench to 30-45°. Press dumbbells from chest level up and slightly together.' },
+    { name:'Cable Chest Fly', sets:3, reps:'12-15', rest:'60s', muscle:'Chest', ytId:'taI4XduLpTk', desc:'Stand between cables, hinge slightly forward, bring handles together in wide arc motion.' },
+    { name:'Push-Ups (Burnout)', sets:2, reps:'Max', rest:'60s', muscle:'Full Chest', ytId:'IODxDxX7oi4', desc:'Control the descent, explosive push. Burnout until failure.' },
+  ]},
+  2: { muscle:'BACK', exercises:[
+    { name:'Deadlift', sets:4, reps:'5-6', rest:'2min', muscle:'Full Back', ytId:'op9kVnSso6Q', desc:'Hinge at hips, neutral spine. Drive through heels. One of the most powerful compound lifts.' },
+    { name:'Pull-Ups', sets:3, reps:'8-12', rest:'90s', muscle:'Lats', ytId:'eGo4IYlbE5g', desc:'Full hang, engage lats, pull chin above bar. Control on the way down.' },
+    { name:'Bent-Over Barbell Row', sets:3, reps:'10-12', rest:'75s', muscle:'Mid Back', ytId:'G8l_8chR5BE', desc:'Hip hinge, flat back. Pull bar to lower chest. Squeeze shoulder blades at top.' },
+    { name:'Lat Pulldown', sets:3, reps:'12-15', rest:'60s', muscle:'Lats', ytId:'CAwf7n6Luuc', desc:'Grip wider than shoulders. Pull bar to upper chest, lean back slightly. Feel the lat stretch.' },
+  ]},
+  3: { muscle:'LEGS', exercises:[
+    { name:'Barbell Squat', sets:4, reps:'6-8', rest:'2min', muscle:'Quads/Glutes', ytId:'bEv6CCg2BC8', desc:'Bar on traps, feet shoulder width, toes out. Squat to parallel or below. Drive through heels.' },
+    { name:'Romanian Deadlift', sets:3, reps:'10-12', rest:'90s', muscle:'Hamstrings', ytId:'JCXUYuzwNrM', desc:'Slight knee bend, hinge at hips, bar traces legs. Deep hamstring stretch at bottom.' },
+    { name:'Leg Press', sets:3, reps:'12-15', rest:'75s', muscle:'Quads', ytId:'IZxyjW7LOLM', desc:'Feet at shoulder width on platform. Lower sled until 90°, press back without locking knees.' },
+    { name:'Standing Calf Raise', sets:4, reps:'15-20', rest:'45s', muscle:'Calves', ytId:'gwLzBv3IC3A', desc:'Full range of motion — full stretch at bottom, full squeeze at top.' },
+  ]},
+  4: { muscle:'SHOULDERS', exercises:[
+    { name:'Overhead Press', sets:4, reps:'6-8', rest:'2min', muscle:'Deltoids', ytId:'2yjwXTZbrDM', desc:'Bar at collarbone level. Press overhead, lock out at top. Core tight throughout.' },
+    { name:'Lateral Raise', sets:3, reps:'12-15', rest:'60s', muscle:'Side Delts', ytId:'3VcKaXpzqRo', desc:'Slight forward lean, thumbs slightly down. Raise to shoulder height — not above.' },
+    { name:'Front Raise', sets:3, reps:'12-15', rest:'60s', muscle:'Front Delts', ytId:'X2pXBWIbW-0', desc:'Alternate arms or both together. Raise to eye level. Controlled movement.' },
+    { name:'Face Pull', sets:3, reps:'15-20', rest:'45s', muscle:'Rear Delts', ytId:'rep-qVOkqgk', desc:'High pulley, rope attachment. Pull to face with elbows flared wide.' },
+  ]},
+  5: { muscle:'ARMS', exercises:[
+    { name:'EZ Bar Bicep Curl', sets:4, reps:'10-12', rest:'60s', muscle:'Biceps', ytId:'kwG2ipFRgfo', desc:'EZ bar grip, elbows pinned to sides. Curl up squeezing bicep, lower under control.' },
+    { name:'Hammer Curl', sets:3, reps:'12-15', rest:'60s', muscle:'Brachialis', ytId:'zC3nLlEvin4', desc:'Neutral grip (thumbs up). Alternate arms, controlled tempo. Targets brachialis and brachioradialis.' },
+    { name:'Tricep Dip', sets:3, reps:'10-12', rest:'75s', muscle:'Triceps', ytId:'6kALZikXxLc', desc:'Upright torso for triceps focus. Lower until 90° at elbow. Press back up fully.' },
+    { name:'Cable Tricep Pushdown', sets:3, reps:'12-15', rest:'60s', muscle:'Triceps', ytId:'vB5OHsJ3EME', desc:'Elbows pinned at sides. Extend fully, squeeze triceps at bottom lockout.' },
+  ]},
+  6: { muscle:'CORE', exercises:[
+    { name:'Hanging Leg Raise', sets:4, reps:'12-15', rest:'60s', muscle:'Lower Abs', ytId:'Pr1ieGZ5ATk', desc:'Dead hang, legs together. Raise legs to 90° or higher. Control the descent.' },
+    { name:'Cable Crunch', sets:3, reps:'15-20', rest:'45s', muscle:'Upper Abs', ytId:'2fbujeH3F0E', desc:'Kneel at cable, rope behind neck. Crunch down pulling elbows to knees.' },
+    { name:'Plank Hold', sets:3, reps:'45-60s', rest:'45s', muscle:'Core Stability', ytId:'pvIjrshnHiw', desc:'Elbows under shoulders, body straight. Squeeze glutes and abs. Do not let hips sag.' },
+    { name:'Russian Twist', sets:3, reps:'20', rest:'45s', muscle:'Obliques', ytId:'wkD8rjkodUI', desc:'Feet elevated, lean back 45°. Rotate side to side. Add weight for progression.' },
+  ]},
+  7: { muscle:'REST', exercises:[
+    { name:'Active Recovery Walk', sets:1, reps:'30 min', rest:'—', muscle:'Full Body', ytId:'_dBoLF6HKNY', desc:'Light 30-minute walk for blood flow and recovery. Keep heart rate low.' },
+    { name:'Full Body Stretch', sets:1, reps:'20 min', rest:'—', muscle:'Flexibility', ytId:'g_tea8ZNk5A', desc:'Hold each stretch 30-60 seconds. Focus on yesterday\'s worked muscles.' },
+    { name:'Foam Rolling', sets:1, reps:'15 min', rest:'—', muscle:'Recovery', ytId:'ew8aMqxMibs', desc:'Roll slowly over tight areas, pause on knots 20-30 seconds.' },
+  ]},
+};
+
+const DAYS = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const NUM_WEEKS = 6;
+
+// ── STATE ──
+let state = {
+  activeWeek: 1,
+  activeDay: 0,
+  completedExercises: {},  // key: "w{week}d{day}e{idx}"
+  completedDays: {},       // key: "w{week}d{day}"
+  completedTasks: {},
+};
+
+try { const s = localStorage.getItem('fz_state'); if(s) state = JSON.parse(s); } catch(e){}
+function saveState() { try { localStorage.setItem('fz_state', JSON.stringify(state)); } catch(e){} }
+
+// ══════════════════════════════════
+// LOGIN
+// ══════════════════════════════════
+function togglePass() {
+  const inp = document.getElementById('passwordInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function doLogin() {
+  const u = document.getElementById('usernameInput').value.trim();
+  const p = document.getElementById('passwordInput').value;
+  const err = document.getElementById('loginError');
+  if(u === CREDS.user && p === CREDS.pass) {
+    document.getElementById('loginScreen').style.animation = 'loginFadeOut 0.5s forwards';
+    setTimeout(() => {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      initApp();
+    }, 500);
+    err.style.display = 'none';
+  } else {
+    err.style.display = 'block';
+    document.getElementById('loginScreen').querySelector('.login-card').style.animation = 'shake 0.4s ease';
+    setTimeout(() => { document.getElementById('loginScreen').querySelector('.login-card').style.animation = ''; }, 400);
+  }
+}
+
+// Enter key login
+document.getElementById('passwordInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('usernameInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginScreen').style.animation = '';
+  document.getElementById('usernameInput').value = '';
+  document.getElementById('passwordInput').value = '';
+}
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes loginFadeOut { to{opacity:0;transform:scale(0.95)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+`;
+document.head.appendChild(style);
+
+// ══════════════════════════════════
+// INIT APP
+// ══════════════════════════════════
+function initApp() {
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+  buildWeekSelector();
+  buildDayStrip();
+  buildWorkoutCards();
+  buildPrograms();
+  buildTasks();
+  buildProgress();
+}
+
+// ══════════════════════════════════
+// WEEK SELECTOR
+// ══════════════════════════════════
+function buildWeekSelector() {
+  const el = document.getElementById('weekSelector');
+  el.innerHTML = '';
+  for(let w=1; w<=NUM_WEEKS; w++) {
+    const chip = document.createElement('div');
+    chip.className = 'week-chip' + (w===state.activeWeek ? ' active' : '');
+    chip.textContent = 'Week ' + w;
+    chip.onclick = () => selectWeek(w);
+    el.appendChild(chip);
+  }
+}
+
+function selectWeek(w) {
+  state.activeWeek = w;
+  document.getElementById('activeWeekLabel').textContent = w;
+  document.getElementById('statWeek').textContent = w;
+  saveState();
+  buildWeekSelector();
+  buildDayStrip();
+  buildWorkoutCards();
+}
+
+// ══════════════════════════════════
+// DAY STRIP
+// ══════════════════════════════════
+function buildDayStrip() {
+  const el = document.getElementById('dayStrip');
+  el.innerHTML = '';
+  DAYS.forEach((d, i) => {
+    const chip = document.createElement('div');
+    const key = `w${state.activeWeek}d${i}`;
+    const done = state.completedDays[key];
+    chip.className = 'day-chip' + (i===state.activeDay ? ' active' : '') + (done ? ' done' : '');
+    chip.innerHTML = `<span class="day-name">${d}</span><span class="day-num">${i+1}</span>`;
+    chip.onclick = () => selectDay(i);
+    el.appendChild(chip);
+  });
+}
+
+function selectDay(i) {
+  state.activeDay = i;
+  saveState();
+  buildDayStrip();
+  buildWorkoutCards();
+}
+
+// ══════════════════════════════════
+// WORKOUT CARDS
+// ══════════════════════════════════
+function buildWorkoutCards() {
+  const dayIdx = state.activeDay; // 0=Mon...6=Sun
+  const wdata = WORKOUT_DATA[dayIdx+1] || WORKOUT_DATA[1];
+  document.getElementById('dayMuscle').textContent = wdata.muscle;
+  const el = document.getElementById('workoutCards');
+  el.innerHTML = '';
+
+  wdata.exercises.forEach((ex, i) => {
+    const key = `w${state.activeWeek}d${state.activeDay}e${i}`;
+    const done = state.completedExercises[key];
+    const thumb = `https://img.youtube.com/vi/${ex.ytId}/hqdefault.jpg`;
+    const card = document.createElement('div');
+    card.className = 'workout-card';
+    card.innerHTML = `
+      <div class="video-thumb" onclick="openVideo('${ex.ytId}','${ex.name.replace(/'/g,"\\'")}','${ex.desc.replace(/'/g,"\\'")}')">
+        <img src="${thumb}" alt="${ex.name}" onerror="this.style.opacity='0'">
+        <div class="play-overlay">
+          <div class="play-btn">▶</div>
+        </div>
+        <div class="video-label">▶ WATCH DEMO</div>
+      </div>
+      <div class="workout-info">
+        <h3>${ex.name}</h3>
+        <div class="workout-meta">
+          <span class="meta-tag sets">${ex.sets} Sets</span>
+          <span class="meta-tag reps">${ex.reps} Reps</span>
+          <span class="meta-tag rest">Rest ${ex.rest}</span>
+          <span class="meta-tag muscle">${ex.muscle}</span>
+        </div>
+        <button class="done-toggle ${done?'completed':''}" onclick="toggleExercise('${key}',this)">
+          <span class="check-icon">${done?'✅':'⬜'}</span>
+          ${done ? 'COMPLETED' : 'MARK AS DONE'}
+        </button>
+      </div>
+    `;
+    el.appendChild(card);
+  });
+
+  updateStats();
+}
+
+function toggleExercise(key, btn) {
+  state.completedExercises[key] = !state.completedExercises[key];
+  saveState();
+  btn.classList.toggle('completed');
+  const done = state.completedExercises[key];
+  btn.innerHTML = `<span class="check-icon">${done?'✅':'⬜'}</span> ${done?'COMPLETED':'MARK AS DONE'}`;
+  if(done) showToast('Exercise Done! 💪');
+  checkDayComplete();
+  updateStats();
+}
+
+function checkDayComplete() {
+  const wdata = WORKOUT_DATA[state.activeDay+1] || WORKOUT_DATA[1];
+  const allDone = wdata.exercises.every((_, i) => state.completedExercises[`w${state.activeWeek}d${state.activeDay}e${i}`]);
+  const key = `w${state.activeWeek}d${state.activeDay}`;
+  if(allDone && !state.completedDays[key]) {
+    state.completedDays[key] = true;
+    saveState();
+    buildDayStrip();
+    showToast('Day Complete! 🔥 Great work!');
+  }
+}
+
+// ══════════════════════════════════
+// STATS
+// ══════════════════════════════════
+function updateStats() {
+  const totalDone = Object.values(state.completedDays).filter(Boolean).length;
+  document.getElementById('statWorkouts').textContent = totalDone;
+  document.getElementById('statStreak').textContent = calcStreak();
+  buildProgress();
+}
+
+function calcStreak() {
+  let streak = 0;
+  for(let w=state.activeWeek; w>=1; w--) {
+    for(let d=6; d>=0; d--) {
+      if(state.completedDays[`w${w}d${d}`]) streak++;
+      else if(streak>0) return streak;
+    }
+  }
+  return streak;
+}
+
+// ══════════════════════════════════
+// VIDEO MODAL
+// ══════════════════════════════════
+function openVideo(ytId, title, desc) {
+  document.getElementById('modalIframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('videoModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalIframe').src = '';
+  document.getElementById('videoModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('videoModal').addEventListener('click', function(e) {
+  if(e.target === this) closeModal();
+});
+
+// ══════════════════════════════════
+// PROGRESS
+// ══════════════════════════════════
+function buildProgress() {
+  // Completion %
+  const total = NUM_WEEKS * 7;
+  const done = Object.keys(state.completedDays).filter(k => state.completedDays[k]).length;
+  const pct = Math.round((done/total)*100);
+  const el = document.getElementById('progressPct');
+  if(el) el.innerHTML = `${pct}<span>%</span>`;
+
+  // Chart — workouts per week
+  const chartEl = document.getElementById('weekChart');
+  if(chartEl) {
+    chartEl.innerHTML = '';
+    const maxH = 100;
+    for(let w=1; w<=NUM_WEEKS; w++) {
+      let wDone = 0;
+      for(let d=0; d<7; d++) { if(state.completedDays[`w${w}d${d}`]) wDone++; }
+      const pct = wDone/7;
+      const wrap = document.createElement('div');
+      wrap.className = 'bar-wrap';
+      wrap.innerHTML = `
+        <div class="bar-fill ${w > state.activeWeek ? 'inactive' : ''}" style="height:${Math.max(4, pct*maxH)}px"></div>
+        <div class="bar-label">W${w}</div>
+      `;
+      chartEl.appendChild(wrap);
+    }
+  }
+
+  // Streak calendar (last 28 days simulated)
+  const grid = document.getElementById('streakGrid');
+  if(grid) {
+    grid.innerHTML = '';
+    const calDays = ['M','T','W','T','F','S','S'];
+    calDays.forEach((d,i) => {
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-family:var(--font-ui);font-size:9px;letter-spacing:1px;color:var(--muted);text-align:center;text-transform:uppercase;';
+      lbl.textContent = d;
+      grid.appendChild(lbl);
+    });
+    for(let w=1; w<=4; w++) {
+      for(let d=0; d<7; d++) {
+        const cell = document.createElement('div');
+        const isDone = state.completedDays[`w${w}d${d}`];
+        const isCurrent = w===state.activeWeek && d===state.activeDay;
+        cell.className = 'streak-day ' + (isCurrent ? 'today' : isDone ? 'done' : 'empty');
+        cell.textContent = `${(w-1)*7+d+1}`;
+        grid.appendChild(cell);
+      }
+    }
+    const sc = document.getElementById('streakCount');
+    if(sc) sc.textContent = `🔥 ${calcStreak()} day streak`;
+  }
+
+  // Badges
+  const badgesEl = document.getElementById('badgesRow');
+  if(badgesEl) {
+    const badges = [
+      { icon:'🔥', name:'First Workout', unlocked: done >= 1 },
+      { icon:'💪', name:'7-Day Streak', unlocked: done >= 7 },
+      { icon:'⚡', name:'Week Complete', unlocked: done >= 7 },
+      { icon:'🏆', name:'30 Workouts', unlocked: done >= 30 },
+      { icon:'💎', name:'Champion', unlocked: done >= 42 },
+      { icon:'🎯', name:'Consistency', unlocked: done >= 14 },
+    ];
+    badgesEl.innerHTML = '';
+    badges.forEach(b => {
+      const card = document.createElement('div');
+      card.className = 'badge-card' + (b.unlocked ? ' unlocked' : '');
+      card.innerHTML = `<span class="badge-icon">${b.unlocked ? b.icon : '🔒'}</span><div class="badge-name">${b.name}</div>`;
+      badgesEl.appendChild(card);
+    });
+  }
+}
+
+// ══════════════════════════════════
+// PROGRAMS
+// ══════════════════════════════════
+function buildPrograms() {
+  const el = document.getElementById('programsList');
+  PROGRAMS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'program-card';
+    card.innerHTML = `
+      <div class="program-header">
+        <div class="program-level ${p.level}">${p.level.toUpperCase()}</div>
+        <div class="program-name">${p.name}</div>
+      </div>
+      <div class="program-body">
+        <div class="program-stats">
+          <div class="prog-stat"><strong>${p.weeks}</strong><br>Weeks</div>
+          <div class="prog-stat" style="flex:1;padding-left:12px">${p.focus}</div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" style="width:${p.progress}%"></div>
+        </div>
+        <div style="font-family:var(--font-ui);font-size:11px;letter-spacing:1px;color:var(--muted);margin-top:6px;text-transform:uppercase">${p.progress}% complete</div>
+      </div>
+    `;
+    card.onclick = () => showToast(`Starting ${p.name}...`);
+    el.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════
+// TASKS
+// ══════════════════════════════════
+const TASKS = [
+  { title:'5-Min Warm-Up', desc:'Jump rope, arm circles, leg swings', type:'warm' },
+  { title:'Check Your Form', desc:'Record a set to review your technique', type:'lift' },
+  { title:'Protein Intake', desc:'Hit 150g protein today — track every meal', type:'nutrition' },
+  { title:'Main Lifts', desc:'Complete all 4 exercises in today\'s plan', type:'lift' },
+  { title:'Hydration Goal', desc:'Drink 3L of water throughout the day', type:'nutrition' },
+  { title:'Cool-Down Stretch', desc:'10-minute full-body stretch after workout', type:'cool' },
+  { title:'Log Your Weights', desc:'Record weights used in today\'s session', type:'lift' },
+  { title:'Sleep 8 Hours', desc:'Recovery is 50% of your progress', type:'cool' },
+];
+
+function buildTasks() {
+  const el = document.getElementById('taskList');
+  el.innerHTML = '';
+  TASKS.forEach((t, i) => {
+    const done = state.completedTasks[i];
+    const item = document.createElement('div');
+    item.className = 'task-item' + (done ? ' done-task' : '');
+    item.innerHTML = `
+      <div class="task-check">${done ? '✓' : ''}</div>
+      <div class="task-content">
+        <h4>${t.title}</h4>
+        <p>${t.desc}</p>
+      </div>
+      <div class="task-badge ${t.type}">${t.type}</div>
+    `;
+    item.onclick = () => toggleTask(i);
+    el.appendChild(item);
+  });
+  updateTaskBadge();
+}
+
+function toggleTask(i) {
+  state.completedTasks[i] = !state.completedTasks[i];
+  saveState();
+  buildTasks();
+  if(state.completedTasks[i]) showToast('Task Completed! ✅');
+}
+
+function updateTaskBadge() {
+  const done = Object.values(state.completedTasks).filter(Boolean).length;
+  const total = TASKS.length;
+  document.getElementById('taskBadge').textContent = `${done}/${total}`;
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='progress') buildProgress();
+}
+
+// ══════════════════════════════════
+// TOAST
+// ══════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
